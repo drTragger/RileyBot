@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/drTragger/rileyBot/internal/app/models"
 	"github.com/yanzay/tbot/v2"
+	"io"
 	"io/ioutil"
 	"log"
 	"math"
@@ -170,23 +171,22 @@ func (b *Bot) weatherHandler(m *tbot.Message) {
 		b.logger.Info("Error during fetching user data: ", err.Error())
 		return
 	}
+
+	var msg string
 	if !ok {
 		b.logger.Info("User and dialog not found")
+		msg = "Пожалуйста, запустите меня, выполнив команду /start"
+		handleMessageError(b.client.SendMessage(m.Chat.ID, msg))
 		return
 	}
 
 	dialog, ok, err := b.storage.Dialog().FindLatestUserDialog(user.ID)
 	if err != nil {
-		b.logger.Info("Error during fetching dialog data: ", err.Error())
-		return
-	}
-	if !ok {
-		b.logger.Info("Dialog not found")
+		b.logger.Error("Error during fetching dialog data: ", err.Error())
 		return
 	}
 
-	var msg string
-	if dialog.Status != true {
+	if !ok || dialog.Status != true {
 		b.logger.Info("No active dialog status")
 		msg = "Прошу прощения, я пока не умею распознавать такие сообщения. Попробуйте:\n\n/play - Поиграть в Камень-Ножницы-Бумага\n\n/weather - Узнать, какая сейчас погода"
 		handleMessageError(b.client.SendMessage(m.Chat.ID, msg))
@@ -202,13 +202,18 @@ func (b *Bot) weatherHandler(m *tbot.Message) {
 
 	res, _ := http.DefaultClient.Do(req)
 
-	defer res.Body.Close()
+	defer func(Body io.ReadCloser) {
+		if err := Body.Close(); err != nil {
+			b.logger.Warning("Failed to close HTTP connection")
+		}
+	}(res.Body)
+
 	body, _ := ioutil.ReadAll(res.Body)
 
 	w := weather{}
 
 	if err := json.Unmarshal(body, &w); err != nil {
-		b.logger.Printf("Error during unmarshalling weather JSON: %s\nResponse: %s", err.Error(), string(body))
+		b.logger.Errorf("Error during unmarshalling weather JSON: %s\nResponse: %s", err.Error(), string(body))
 		msg = "Извините, временно туплю.\nНе могу обработать данные о погоде.\nПожалуйста, попробуйте позже.\nА пока можете поиграть в Камень-Ножницы-Бумага /play"
 	} else {
 		if w.Count < 1 {
@@ -317,7 +322,7 @@ func (b *Bot) weatherHandler(m *tbot.Message) {
 	}
 
 	if err := b.storage.Dialog().UpdateStatus(dialog.ID); err != nil {
-		b.logger.Info("Error during updating dialog status: ", err.Error())
+		b.logger.Error("Error during updating dialog status: ", err.Error())
 	}
 
 	handleMessageError(b.client.SendMessage(m.Chat.ID, msg))
