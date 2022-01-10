@@ -46,7 +46,7 @@ func handleMessageError(message *tbot.Message, err error) {
 func (b *Bot) StartHandler(m *tbot.Message) {
 	handleChatActionError(b.client.SendChatAction(m.Chat.ID, tbot.ActionTyping))
 	time.Sleep(1 * time.Second)
-	var stdMessage = "Привет, я бот Райли🖖\n\n/play\tКамень-Ножницы-Бумага"
+	var stdMessage = "Привет, я бот Райли🖖\n\n/play\tКамень-Ножницы-Бумага\n\n/weather\tУзнать прогноз погоды"
 	b.LogHandler(m)
 	var msg string
 	userId, err := strconv.Atoi(m.Chat.ID)
