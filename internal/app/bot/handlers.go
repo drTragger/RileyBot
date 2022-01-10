@@ -78,7 +78,7 @@ func (b *Bot) StartHandler(m *tbot.Message) {
 func (b *Bot) PlayHandler(m *tbot.Message) {
 	b.LogHandler(m)
 	handleChatActionError(b.client.SendChatAction(m.Chat.ID, tbot.ActionTyping))
-	time.Sleep(1 * time.Second)
+	time.Sleep(500 * time.Millisecond)
 	buttons := makeButtons()
 	handleMessageError(b.client.SendMessage(m.Chat.ID, "Твой ход:", tbot.OptInlineKeyboardMarkup(buttons)))
 }
@@ -86,7 +86,7 @@ func (b *Bot) PlayHandler(m *tbot.Message) {
 func (b *Bot) CallbackHandler(cq *tbot.CallbackQuery) {
 	b.LogCallbackHandler(cq)
 	handleChatActionError(b.client.SendChatAction(cq.Message.Chat.ID, tbot.ActionTyping))
-	time.Sleep(1 * time.Second)
+	time.Sleep(500 * time.Millisecond)
 	humanMove := cq.Data
 	msg := playGame(humanMove)
 	handleChatActionError(b.client.DeleteMessage(cq.Message.Chat.ID, cq.Message.MessageID))
@@ -136,6 +136,9 @@ type weather struct {
 
 func (b *Bot) cityRequestHandler(m *tbot.Message) {
 	b.LogHandler(m)
+	handleChatActionError(b.client.SendChatAction(m.Chat.ID, tbot.ActionTyping))
+	time.Sleep(500 * time.Millisecond)
+
 	var user *models.User
 	user, ok, err := b.storage.User().FindByTelegramUsername(m.From.Username)
 	if err != nil {
@@ -160,7 +163,8 @@ func (b *Bot) cityRequestHandler(m *tbot.Message) {
 
 func (b *Bot) weatherHandler(m *tbot.Message) {
 	b.LogHandler(m)
-	fmt.Println(b.storage.User())
+	handleChatActionError(b.client.SendChatAction(m.Chat.ID, tbot.ActionTyping))
+
 	user, ok, err := b.storage.User().FindByTelegramUsername(m.From.Username)
 	if err != nil {
 		b.logger.Info("Error during fetching user data: ", err.Error())
