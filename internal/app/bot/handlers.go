@@ -309,11 +309,19 @@ func (b *Bot) weatherHandler(m *tbot.Message) {
 				msg += "\n"
 				if len(coordinates) == 0 {
 					for j := 0; j < utf8.RuneCountInString(w.List[i].Sys.Country)+utf8.RuneCountInString(w.List[i].Name)+16; j++ {
-						msg += "="
+						if j < 32 {
+							msg += "="
+						} else {
+							break
+						}
 					}
 				} else {
 					for j := 0; j < utf8.RuneCountInString(coordinates)-2; j++ {
-						msg += "="
+						if j < 32 {
+							msg += "="
+						} else {
+							break
+						}
 					}
 				}
 				msg += "\n\n"
