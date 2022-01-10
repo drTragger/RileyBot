@@ -17,9 +17,21 @@ var (
 
 func (ur *UserRepository) Create(u *models.User) error {
 	query := fmt.Sprintf("INSERT INTO %s (username, telegram_id) VALUES (?, ?)", tableUsers)
-	if _, err := ur.storage.db.Query(query, u.Username, u.TelegramId); err != nil {
+	stmt, err := ur.storage.db.Prepare(query)
+	if err != nil {
 		return err
 	}
+	defer stmt.Close()
+
+	res, err := stmt.Exec(u.Username, u.TelegramId)
+	if err != nil {
+		return err
+	}
+	id, err := res.LastInsertId()
+	if err != nil {
+		return err
+	}
+	u.ID = int(id)
 	return nil
 }
 

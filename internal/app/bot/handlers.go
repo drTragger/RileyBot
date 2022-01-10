@@ -150,8 +150,10 @@ func (b *Bot) cityRequestHandler(m *tbot.Message) {
 		if err != nil {
 			b.logger.Info("Failed to convert user ID ", err.Error())
 		}
+
 		user = &models.User{Username: m.From.Username, TelegramId: &userId}
-		if err := b.storage.User().Create(user); err != nil {
+		err = b.storage.User().Create(user)
+		if err != nil {
 			b.logger.Info("Failed to create new user: ", err.Error())
 		}
 	}
