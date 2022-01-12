@@ -118,7 +118,7 @@ func (b *Bot) weatherHandler(m *tbot.Message) {
 		return
 	}
 
-	dialog, ok, err := b.storage.Dialog().FindLatestUserDialog(user.ID)
+	dialog, ok, err := b.storage.Dialog().FindLatestUserDialog(user.ID, "weather")
 	if err != nil {
 		b.logger.Error("Error during fetching dialog data: ", err.Error())
 		msg = "Извините, временно туплю.\nПожалуйста, попробуйте позже.\nА пока можете поиграть в Камень-Ножницы-Бумага /play"

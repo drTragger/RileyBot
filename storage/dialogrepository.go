@@ -30,10 +30,10 @@ func (dr *DialogRepository) UpdateStatus(id int) error {
 	return nil
 }
 
-func (dr *DialogRepository) FindLatestUserDialog(userId int) (*models.Dialog, bool, error) {
+func (dr *DialogRepository) FindLatestUserDialog(userId int, dialogName string) (*models.Dialog, bool, error) {
 	query := fmt.Sprintf("SELECT * FROM %s WHERE user_id=? AND name=? ORDER BY id DESC LIMIT 1", tableDialogs)
 	dialog := models.Dialog{}
-	row := dr.storage.db.QueryRow(query, userId, "weather")
+	row := dr.storage.db.QueryRow(query, userId, dialogName)
 	switch err := row.Scan(&dialog.ID, &dialog.UserId, &dialog.Name, &dialog.Status); err {
 	case sql.ErrNoRows:
 		return nil, false, nil
