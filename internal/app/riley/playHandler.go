@@ -22,19 +22,21 @@ var (
 )
 
 func (b *Bot) PlayHandler(m *tbot.Message) {
-	b.LogHandler(m)
 	handleChatActionError(b.client.SendChatAction(m.Chat.ID, tbot.ActionTyping))
 	time.Sleep(500 * time.Millisecond)
 	buttons := makeButtons()
+
+	b.LogHandler(m, "Showed buttons")
 	handleMessageError(b.client.SendMessage(m.Chat.ID, "Твой ход:", tbot.OptInlineKeyboardMarkup(buttons)))
 }
 
 func (b *Bot) CallbackHandler(cq *tbot.CallbackQuery) {
-	b.LogCallbackHandler(cq)
 	handleChatActionError(b.client.SendChatAction(cq.Message.Chat.ID, tbot.ActionTyping))
 	time.Sleep(500 * time.Millisecond)
 	humanMove := cq.Data
 	msg := playGame(humanMove)
+
+	b.LogCallbackHandler(cq, msg)
 	handleChatActionError(b.client.DeleteMessage(cq.Message.Chat.ID, cq.Message.MessageID))
 	handleMessageError(b.client.SendMessage(cq.Message.Chat.ID, msg))
 }

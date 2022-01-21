@@ -11,7 +11,6 @@ func (b *Bot) StartHandler(m *tbot.Message) {
 	handleChatActionError(b.client.SendChatAction(m.Chat.ID, tbot.ActionTyping))
 	time.Sleep(500 * time.Millisecond)
 	var stdMessage = "Привет, я бот Райли🖖\n\n/play\tКамень-Ножницы-Бумага\n\n/weather\tУзнать прогноз погоды"
-	b.LogHandler(m)
 	var msg string
 	userId, err := strconv.Atoi(m.Chat.ID)
 	if err != nil {
@@ -37,5 +36,6 @@ func (b *Bot) StartHandler(m *tbot.Message) {
 		msg = stdMessage
 	}
 
+	b.LogHandler(m, msg)
 	handleMessageError(b.client.SendMessage(m.Chat.ID, msg))
 }

@@ -11,6 +11,7 @@ type Storage struct {
 	db               *sql.DB
 	userRepository   *UserRepository
 	dialogRepository *DialogRepository
+	jokeRepository   *JokeRepository
 }
 
 func New(config *Config) *Storage {
@@ -57,4 +58,14 @@ func (storage *Storage) Dialog() *DialogRepository {
 		storage: storage,
 	}
 	return storage.dialogRepository
+}
+
+func (storage *Storage) Joke() *JokeRepository {
+	if storage.jokeRepository != nil {
+		return storage.jokeRepository
+	}
+	storage.jokeRepository = &JokeRepository{
+		storage: storage,
+	}
+	return storage.jokeRepository
 }

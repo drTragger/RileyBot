@@ -18,6 +18,7 @@ func (b *Bot) configureRouterField() {
 	b.riley.HandleMessage("/start", b.StartHandler)
 	b.riley.HandleMessage("/play", b.PlayHandler)
 	b.riley.HandleMessage("/weather", b.cityRequestHandler)
+	b.riley.HandleMessage("/joke", b.jokesHandler)
 	b.riley.HandleMessage("", b.weatherHandler)
 	b.riley.HandleCallback(b.CallbackHandler)
 }

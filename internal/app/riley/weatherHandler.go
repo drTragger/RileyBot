@@ -70,36 +70,51 @@ type weather struct {
 }
 
 func (b *Bot) cityRequestHandler(m *tbot.Message) {
-	b.LogHandler(m)
 	handleChatActionError(b.client.SendChatAction(m.Chat.ID, tbot.ActionTyping))
 	time.Sleep(500 * time.Millisecond)
 
+	var msg string
 	var user *models.User
 	user, ok, err := b.storage.User().FindByTelegramUsername(m.From.Username)
 	if err != nil {
 		b.logger.Info("Error during fetching user data: ", err.Error())
+		msg = "Извините, временно туплю.\nПожалуйста, попробуйте позже.\nА пока можете поиграть в Камень-Ножницы-Бумага /play"
+		handleMessageError(b.client.SendMessage(m.Chat.ID, msg))
+		return
 	}
 	if !ok {
 		userId, err := strconv.Atoi(m.Chat.ID)
 		if err != nil {
 			b.logger.Info("Failed to convert user ID ", err.Error())
+			msg = "Извините, временно туплю.\nПожалуйста, попробуйте позже.\nА пока можете поиграть в Камень-Ножницы-Бумага /play"
+			handleMessageError(b.client.SendMessage(m.Chat.ID, msg))
+			return
 		}
 
 		user = &models.User{Username: m.From.Username, TelegramId: &userId}
 		err = b.storage.User().Create(user)
 		if err != nil {
 			b.logger.Info("Failed to create new user: ", err.Error())
+			msg = "Извините, временно туплю.\nПожалуйста, попробуйте позже.\nА пока можете поиграть в Камень-Ножницы-Бумага /play"
+			handleMessageError(b.client.SendMessage(m.Chat.ID, msg))
+			return
 		}
 	}
 	err = b.storage.Dialog().Create(&models.Dialog{Name: "weather", UserId: user.ID, Status: true})
 	if err != nil {
 		b.logger.Info("Failed to create new dialog: ", err.Error())
+		msg = "Извините, временно туплю.\nПожалуйста, попробуйте позже.\nА пока можете поиграть в Камень-Ножницы-Бумага /play"
+		handleMessageError(b.client.SendMessage(m.Chat.ID, msg))
+		return
 	}
-	handleMessageError(b.client.SendMessage(m.Chat.ID, "Напишите мне название города, в котором хотите узнать погоду"))
+
+	msg = "Напишите мне название города, в котором хотите узнать погоду"
+
+	b.LogHandler(m, msg)
+	handleMessageError(b.client.SendMessage(m.Chat.ID, msg))
 }
 
 func (b *Bot) weatherHandler(m *tbot.Message) {
-	b.LogHandler(m)
 	handleChatActionError(b.client.SendChatAction(m.Chat.ID, tbot.ActionTyping))
 
 	user, ok, err := b.storage.User().FindByTelegramUsername(m.From.Username)
@@ -190,6 +205,7 @@ func (b *Bot) weatherHandler(m *tbot.Message) {
 		b.logger.Error("Error during updating dialog status: ", err.Error())
 	}
 
+	b.LogHandler(m, msg)
 	handleMessageError(b.client.SendMessage(m.Chat.ID, msg))
 }
 

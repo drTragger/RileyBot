@@ -36,10 +36,10 @@ func (b *Bot) Start() error {
 	return b.riley.Start()
 }
 
-func (b *Bot) LogHandler(m *tbot.Message) {
-	b.logger.Printf("%s\nUsername: %s\nChat ID: %s\nMessage: %s\n============================", time.Now().UTC(), m.From.Username, m.Chat.ID, m.Text)
+func (b *Bot) LogHandler(m *tbot.Message, answer string) {
+	b.logger.Printf("%s\nUsername: %s\nChat ID: %s\nMessage: %s\nAnswer: %s\n============================", time.Now().UTC(), m.From.Username, m.Chat.ID, m.Text, answer)
 }
 
-func (b *Bot) LogCallbackHandler(cq *tbot.CallbackQuery) {
-	b.logger.Printf("%s\nUsername: %s\nChat ID: %s\nMessage: %s\n============================", time.Now().UTC(), cq.From.Username, cq.Message.Chat.ID, cq.Message.Text)
+func (b *Bot) LogCallbackHandler(cq *tbot.CallbackQuery, answer string) {
+	b.logger.Printf("%s\nUsername: %s\nChat ID: %s\nMessage: %s\nnAnswer: %s\n============================", time.Now().UTC(), cq.From.Username, cq.Message.Chat.ID, cq.Message.Text, answer)
 }
