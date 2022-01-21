@@ -298,23 +298,13 @@ func getCloudsEmoji(clouds int) string {
 
 func getCitiesDelimiter(w *weather) string {
 	delimiter := "\n"
+	var lineLen int
 	if len(w.coordinates) == 0 {
-		for j := 0; j < utf8.RuneCountInString(w.country)+utf8.RuneCountInString(w.city)+16; j++ {
-			if j < 32 {
-				delimiter += "="
-			} else {
-				break
-			}
-		}
+		lineLen = utf8.RuneCountInString(w.country) + utf8.RuneCountInString(w.city) + 16
 	} else {
-		for j := 0; j < utf8.RuneCountInString(w.coordinates)-2; j++ {
-			if j < 32 {
-				delimiter += "="
-			} else {
-				break
-			}
-		}
+		lineLen = utf8.RuneCountInString(w.coordinates) - 2
 	}
+	delimiter += fmt.Sprintf("%s", strings.Repeat("=", lineLen))
 	delimiter += "\n\n"
 
 	return delimiter
