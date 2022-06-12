@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"github.com/BurntSushi/toml"
-	"github.com/drTragger/rileyBot/internal/app/riley"
+	"github.com/drTragger/RileyBot/internal/app/riley"
 	"github.com/yanzay/tbot/v2"
 	"log"
 )

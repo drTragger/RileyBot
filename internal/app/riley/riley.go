@@ -1,7 +1,7 @@
 package riley
 
 import (
-	"github.com/drTragger/rileyBot/storage"
+	"github.com/drTragger/RileyBot/storage"
 	"github.com/sirupsen/logrus"
 	"github.com/yanzay/tbot/v2"
 	"time"

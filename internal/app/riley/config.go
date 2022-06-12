@@ -1,6 +1,6 @@
 package riley
 
-import "github.com/drTragger/rileyBot/storage"
+import "github.com/drTragger/RileyBot/storage"
 
 type Config struct {
 	BotToken    string `toml:"bot_token"`

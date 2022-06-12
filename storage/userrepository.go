@@ -3,7 +3,7 @@ package storage
 import (
 	"database/sql"
 	"fmt"
-	"github.com/drTragger/rileyBot/internal/app/models"
+	"github.com/drTragger/RileyBot/internal/app/models"
 )
 
 type UserRepository struct {

@@ -3,7 +3,7 @@ package riley
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/drTragger/rileyBot/internal/app/models"
+	"github.com/drTragger/RileyBot/internal/app/models"
 	"github.com/yanzay/tbot/v2"
 	"io"
 	"io/ioutil"
@@ -78,7 +78,7 @@ func (b *Bot) cityRequestHandler(m *tbot.Message) {
 	user, ok, err := b.storage.User().FindByTelegramUsername(m.From.Username)
 	if err != nil {
 		b.logger.Info("Error during fetching user data: ", err.Error())
-		msg = "Извините, временно туплю.\nПожалуйста, попробуйте позже.\nА пока можете поиграть в Камень-Ножницы-Бумага /play"
+		msg = "Вибачте, тимчасово туплю.\nБудь ласка, спробуйте пізніше.\nА поки можете пограти у Камінь-Ножиці-Папір /play"
 		handleMessageError(b.client.SendMessage(m.Chat.ID, msg))
 		return
 	}
@@ -86,7 +86,7 @@ func (b *Bot) cityRequestHandler(m *tbot.Message) {
 		userId, err := strconv.Atoi(m.Chat.ID)
 		if err != nil {
 			b.logger.Info("Failed to convert user ID ", err.Error())
-			msg = "Извините, временно туплю.\nПожалуйста, попробуйте позже.\nА пока можете поиграть в Камень-Ножницы-Бумага /play"
+			msg = "Вибачте, тимчасово туплю.\nБудь ласка, спробуйте пізніше.\nА поки можете пограти у Камінь-Нножиці-Папір /play"
 			handleMessageError(b.client.SendMessage(m.Chat.ID, msg))
 			return
 		}
@@ -95,7 +95,7 @@ func (b *Bot) cityRequestHandler(m *tbot.Message) {
 		err = b.storage.User().Create(user)
 		if err != nil {
 			b.logger.Info("Failed to create new user: ", err.Error())
-			msg = "Извините, временно туплю.\nПожалуйста, попробуйте позже.\nА пока можете поиграть в Камень-Ножницы-Бумага /play"
+			msg = "Вибачте, тимчасово туплю.\nБудь ласка, спробуйте пізніше.\nА поки можете пограти у Камінь-Ножиці-Папір /play"
 			handleMessageError(b.client.SendMessage(m.Chat.ID, msg))
 			return
 		}
@@ -103,12 +103,12 @@ func (b *Bot) cityRequestHandler(m *tbot.Message) {
 	err = b.storage.Dialog().Create(&models.Dialog{Name: "weather", UserId: user.ID, Status: true})
 	if err != nil {
 		b.logger.Info("Failed to create new dialog: ", err.Error())
-		msg = "Извините, временно туплю.\nПожалуйста, попробуйте позже.\nА пока можете поиграть в Камень-Ножницы-Бумага /play"
+		msg = "Вибачте, тимчасово туплю.\nБудь ласка, спробуйте пізніше.\nА поки можете пограти у Камінь-Ножиці-Папір /play"
 		handleMessageError(b.client.SendMessage(m.Chat.ID, msg))
 		return
 	}
 
-	msg = "Напишите мне название города, в котором хотите узнать погоду"
+	msg = "Напишіть мені назву міста, у якому хочете дізнатись погоду"
 
 	b.LogHandler(m, msg)
 	handleMessageError(b.client.SendMessage(m.Chat.ID, msg))
@@ -121,14 +121,14 @@ func (b *Bot) weatherHandler(m *tbot.Message) {
 	var msg string
 	if err != nil {
 		b.logger.Info("Error during fetching user data: ", err.Error())
-		msg = "Извините, временно туплю.\nПожалуйста, попробуйте позже.\nА пока можете поиграть в Камень-Ножницы-Бумага /play"
+		msg = "Вибачте, тимчасово туплю.\nБудь ласка, спробуйте пізніше.\nА поки можете пограти у Камінь-Ножиці-Папір /play"
 		handleMessageError(b.client.SendMessage(m.Chat.ID, msg))
 		return
 	}
 
 	if !ok {
 		b.logger.Info("User and dialog not found")
-		msg = "Пожалуйста, запустите меня, выполнив команду /start"
+		msg = "Будь ласка, запустіть мене, виконавши команду /start"
 		handleMessageError(b.client.SendMessage(m.Chat.ID, msg))
 		return
 	}
@@ -136,30 +136,35 @@ func (b *Bot) weatherHandler(m *tbot.Message) {
 	dialog, ok, err := b.storage.Dialog().FindLatestUserDialog(user.ID, "weather")
 	if err != nil {
 		b.logger.Error("Error during fetching dialog data: ", err.Error())
-		msg = "Извините, временно туплю.\nПожалуйста, попробуйте позже.\nА пока можете поиграть в Камень-Ножницы-Бумага /play"
+		msg = "Вибачте, тимчасово туплю.\nБудь ласка, спробуйте пізніше.\nА поки можете пограти у Камінь-Ножиці-Папір /play"
 		handleMessageError(b.client.SendMessage(m.Chat.ID, msg))
 		return
 	}
 
 	if !ok || dialog.Status != true {
 		b.logger.Info("No active dialog status")
-		msg = "Прошу прощения, я пока не умею распознавать такие сообщения. Попробуйте:\n\n/play - Поиграть в Камень-Ножницы-Бумага\n\n/weather - Узнать, какая сейчас погода"
+		msg = "Перепрошую, я поки не вмію розпізнавати такі повідомлення. Спробуйте:\n\n/play - Пограти у Камінь-Ножиці-Папір\n\n/weather - Дізнатись, яка зараз погода"
 		handleMessageError(b.client.SendMessage(m.Chat.ID, msg))
 		return
 	}
 
 	ow, err, response := getWeatherData(b.config.WeatherKey, m.Text)
+	fmt.Printf("%+v\n", ow)
 
 	if err != nil {
 		b.logger.Errorf("Error during unmarshalling weather JSON: %s\nResponse: %s", err.Error(), response)
-		msg = "Извините, временно туплю.\nНе могу обработать данные о погоде.\nПожалуйста, попробуйте позже.\nА пока можете поиграть в Камень-Ножницы-Бумага /play"
+		msg = "Вибачте, тимчасово туплю.\nНе можу обробити дані про погоду.\nБудь ласка, спробуйте пізніше.\nА поки можете пограти у Камінь-Ножиці-Папір /play"
 	} else {
 		if ow.Count < 1 {
-			handleMessageError(b.client.SendMessage(m.Chat.ID, "Хмм...🤔\nЧто-то я не слышал о таком городе.\nПопробуйте другой."))
+			handleMessageError(b.client.SendMessage(m.Chat.ID, "Хмм...🤔\nНе чув про таке місто.\nСпробуйте інше."))
 			return
 		}
 		b.logger.Info(ow)
 		for i := 0; i < ow.Count; i++ {
+			if ow.List[i].Sys.Country == "RU" {
+				msg = "Фу, я не буду лізти у той смітник щоб дізнатись погоду"
+				break
+			}
 			var weatherDescription string
 			for k, val := range ow.List[i].Weather {
 				weatherDescription += getWeatherDescription(val.Description, val.Icon)
@@ -185,13 +190,13 @@ func (b *Bot) weatherHandler(m *tbot.Message) {
 			}
 
 			msg += fmt.Sprintf(""+
-				"Город/Страна: %s [%s]\n%s"+
+				"Місто/Країна: %s [%s]\n%s"+
 				"%s\n\n"+
 				"Температура🌡: %d°C\n"+
-				"Ощущается как🌡: %d°C\n\n"+
-				"Влажность💧: %d%%\n"+
-				"Скорость ветра💨: %d м/с\n"+
-				"Облачность: %d%% %s\n",
+				"Відчувається як🌡: %d°C\n\n"+
+				"Вологість💧: %d%%\n"+
+				"Швидкість вітру💨: %d м/с\n"+
+				"Хмарність: %d%% %s\n",
 				weatherData.city, weatherData.country, weatherData.coordinates, weatherData.description, weatherData.temp,
 				weatherData.feelsLike, weatherData.humidity, weatherData.windSpeed, weatherData.clouds, getCloudsEmoji(weatherData.clouds),
 			)
@@ -210,7 +215,7 @@ func (b *Bot) weatherHandler(m *tbot.Message) {
 }
 
 func getWeatherData(weatherKey string, requestCity string) (*openWeather, error, string) {
-	url := "https://community-open-weather-map.p.rapidapi.com/find?q=" + strings.ReplaceAll(strings.TrimSpace(requestCity), " ", "+") + "&lang=ru&mode=null&lon=0&type=link%2C%20accurate&lat=0&units=metric"
+	url := "https://community-open-weather-map.p.rapidapi.com/find?q=" + strings.ReplaceAll(strings.TrimSpace(requestCity), " ", "+") + "&lang=ua&mode=null&lon=0&type=link%2C%20accurate&lat=0&units=metric"
 
 	req, _ := http.NewRequest("GET", url, nil)
 

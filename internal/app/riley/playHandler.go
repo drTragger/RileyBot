@@ -18,7 +18,7 @@ var (
 		"scissors": "paper",
 		"rock":     "scissors",
 	}
-	translations = map[string]string{"scissors": "ножницы✂", "rock": "камень🗿", "paper": "бумагу\U0001F9FB"}
+	translations = map[string]string{"scissors": "ножиці✂", "rock": "камінь🗿", "paper": "папір\U0001F9FB"}
 )
 
 func (b *Bot) PlayHandler(m *tbot.Message) {
@@ -27,7 +27,7 @@ func (b *Bot) PlayHandler(m *tbot.Message) {
 	buttons := makeButtons()
 
 	b.LogHandler(m, "Showed buttons")
-	handleMessageError(b.client.SendMessage(m.Chat.ID, "Твой ход:", tbot.OptInlineKeyboardMarkup(buttons)))
+	handleMessageError(b.client.SendMessage(m.Chat.ID, "Твій ход:", tbot.OptInlineKeyboardMarkup(buttons)))
 }
 
 func (b *Bot) CallbackHandler(cq *tbot.CallbackQuery) {
@@ -43,15 +43,15 @@ func (b *Bot) CallbackHandler(cq *tbot.CallbackQuery) {
 
 func makeButtons() *tbot.InlineKeyboardMarkup {
 	btnRock := tbot.InlineKeyboardButton{
-		Text:         "Камень",
+		Text:         "Камінь",
 		CallbackData: "rock",
 	}
 	btnPaper := tbot.InlineKeyboardButton{
-		Text:         "Бумага",
+		Text:         "Папір",
 		CallbackData: "paper",
 	}
 	btnScissors := tbot.InlineKeyboardButton{
-		Text:         "Ножницы",
+		Text:         "Ножиці",
 		CallbackData: "scissors",
 	}
 
@@ -67,12 +67,12 @@ func playGame(humanMove string) (msg string) {
 	botMove := picks[rand.Intn(len(picks))]
 	switch humanMove {
 	case botMove:
-		result = "Ничья"
+		result = "Нічия"
 	case options[botMove]:
-		result = "Ты проиграл"
+		result = "Ти програв"
 	default:
-		result = "Ты выиграл"
+		result = "Ти переміг"
 	}
-	msg = fmt.Sprintf("%s!\nТы выбрал %s\nЯ выбрал %s", result, translations[humanMove], translations[botMove])
+	msg = fmt.Sprintf("%s!\nТи обрав %s\nЯ обрав %s", result, translations[humanMove], translations[botMove])
 	return
 }

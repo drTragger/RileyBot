@@ -1,7 +1,7 @@
 package riley
 
 import (
-	"github.com/drTragger/rileyBot/storage"
+	"github.com/drTragger/RileyBot/storage"
 	"github.com/sirupsen/logrus"
 )
 
@@ -19,6 +19,7 @@ func (b *Bot) configureRouterField() {
 	b.riley.HandleMessage("/play", b.PlayHandler)
 	b.riley.HandleMessage("/weather", b.cityRequestHandler)
 	b.riley.HandleMessage("/joke", b.jokesHandler)
+	b.riley.HandleMessage("Слава Україні", b.GloryToUkraineHandler)
 	b.riley.HandleMessage("", b.weatherHandler)
 	b.riley.HandleCallback(b.CallbackHandler)
 }

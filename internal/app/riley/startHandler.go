@@ -1,7 +1,7 @@
 package riley
 
 import (
-	"github.com/drTragger/rileyBot/internal/app/models"
+	"github.com/drTragger/RileyBot/internal/app/models"
 	"github.com/yanzay/tbot/v2"
 	"strconv"
 	"time"
@@ -10,7 +10,7 @@ import (
 func (b *Bot) StartHandler(m *tbot.Message) {
 	handleChatActionError(b.client.SendChatAction(m.Chat.ID, tbot.ActionTyping))
 	time.Sleep(500 * time.Millisecond)
-	var stdMessage = "Привет, я бот Райли🖖\n\n/play\tКамень-Ножницы-Бумага\n\n/weather\tУзнать прогноз погоды"
+	var stdMessage = "Вітаю, я бот Райлі🖖\n\nСлава Україні🇺🇦\n\n/play\tКамінь-Ножиці-Папір\n\n/weather\tДізнатись прогноз погоди"
 	var msg string
 	userId, err := strconv.Atoi(m.Chat.ID)
 	if err != nil {
