@@ -28,7 +28,7 @@ func (b *Bot) Start() error {
 	if err := b.configureLoggerField(); err != nil {
 		return err
 	}
-	b.logger.Info("Started Riley riley")
+	b.logger.Info("Riley is alive")
 	b.configureRouterField()
 	if err := b.configureStorageField(); err != nil {
 		return err
