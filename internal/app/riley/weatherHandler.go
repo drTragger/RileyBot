@@ -10,7 +10,6 @@ import (
 	"log"
 	"math"
 	"net/http"
-	"strconv"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -73,37 +72,9 @@ func (b *Bot) cityRequestHandler(m *tbot.Message) {
 	handleChatActionError(b.client.SendChatAction(m.Chat.ID, tbot.ActionTyping))
 	time.Sleep(500 * time.Millisecond)
 
-	var msg string
-	var user *models.User
-	user, ok, err := b.storage.User().FindByTelegramUsername(m.From.Username)
-	if err != nil {
-		b.logger.Info("Error during fetching user data: ", err.Error())
-		msg = "Вибачте, тимчасово туплю.\nБудь ласка, спробуйте пізніше.\nА поки можете пограти у Камінь-Ножиці-Папір /play"
-		handleMessageError(b.client.SendMessage(m.Chat.ID, msg))
-		return
-	}
-	if !ok {
-		userId, err := strconv.Atoi(m.Chat.ID)
-		if err != nil {
-			b.logger.Info("Failed to convert user ID ", err.Error())
-			msg = "Вибачте, тимчасово туплю.\nБудь ласка, спробуйте пізніше.\nА поки можете пограти у Камінь-Нножиці-Папір /play"
-			handleMessageError(b.client.SendMessage(m.Chat.ID, msg))
-			return
-		}
+	msg, ok := b.NewDialog(m.Chat.Username, m.Chat.ID, "weather")
 
-		user = &models.User{Username: m.From.Username, TelegramId: &userId}
-		err = b.storage.User().Create(user)
-		if err != nil {
-			b.logger.Info("Failed to create new user: ", err.Error())
-			msg = "Вибачте, тимчасово туплю.\nБудь ласка, спробуйте пізніше.\nА поки можете пограти у Камінь-Ножиці-Папір /play"
-			handleMessageError(b.client.SendMessage(m.Chat.ID, msg))
-			return
-		}
-	}
-	err = b.storage.Dialog().Create(&models.Dialog{Name: "weather", UserId: user.ID, Status: true})
-	if err != nil {
-		b.logger.Info("Failed to create new dialog: ", err.Error())
-		msg = "Вибачте, тимчасово туплю.\nБудь ласка, спробуйте пізніше.\nА поки можете пограти у Камінь-Ножиці-Папір /play"
+	if !ok {
 		handleMessageError(b.client.SendMessage(m.Chat.ID, msg))
 		return
 	}
@@ -117,43 +88,19 @@ func (b *Bot) cityRequestHandler(m *tbot.Message) {
 func (b *Bot) weatherHandler(m *tbot.Message) {
 	handleChatActionError(b.client.SendChatAction(m.Chat.ID, tbot.ActionTyping))
 
-	user, ok, err := b.storage.User().FindByTelegramUsername(m.From.Username)
-	var msg string
-	if err != nil {
-		b.logger.Info("Error during fetching user data: ", err.Error())
-		msg = "Вибачте, тимчасово туплю.\nБудь ласка, спробуйте пізніше.\nА поки можете пограти у Камінь-Ножиці-Папір /play"
-		handleMessageError(b.client.SendMessage(m.Chat.ID, msg))
-		return
-	}
+	dialog := &models.Dialog{}
+	msg, dialog, ok := b.CheckDialogStatus(m.Chat.Username, "weather")
 
 	if !ok {
-		b.logger.Info("User and dialog not found")
-		msg = "Будь ласка, запустіть мене, виконавши команду /start"
-		handleMessageError(b.client.SendMessage(m.Chat.ID, msg))
-		return
-	}
-
-	dialog, ok, err := b.storage.Dialog().FindLatestUserDialog(user.ID, "weather")
-	if err != nil {
-		b.logger.Error("Error during fetching dialog data: ", err.Error())
-		msg = "Вибачте, тимчасово туплю.\nБудь ласка, спробуйте пізніше.\nА поки можете пограти у Камінь-Ножиці-Папір /play"
-		handleMessageError(b.client.SendMessage(m.Chat.ID, msg))
-		return
-	}
-
-	if !ok || dialog.Status != true {
-		b.logger.Info("No active dialog status")
-		msg = "Перепрошую, я поки не вмію розпізнавати такі повідомлення. Спробуйте:\n\n/play - Пограти у Камінь-Ножиці-Папір\n\n/weather - Дізнатись, яка зараз погода"
 		handleMessageError(b.client.SendMessage(m.Chat.ID, msg))
 		return
 	}
 
 	ow, err, response := getWeatherData(b.config.WeatherKey, m.Text)
-	fmt.Printf("%+v\n", ow)
 
 	if err != nil {
 		b.logger.Errorf("Error during unmarshalling weather JSON: %s\nResponse: %s", err.Error(), response)
-		msg = "Вибачте, тимчасово туплю.\nНе можу обробити дані про погоду.\nБудь ласка, спробуйте пізніше.\nА поки можете пограти у Камінь-Ножиці-Папір /play"
+		msg = errorMessage
 	} else {
 		if ow.Count < 1 {
 			handleMessageError(b.client.SendMessage(m.Chat.ID, "Хмм...🤔\nНе чув про таке місто.\nСпробуйте інше."))
