@@ -1,6 +1,6 @@
 run: migrate
 	go run github.com/drTragger/RileyBot/cmd/bot
 migrate:
-	migrate -path migrations -database "mysql://misha:1m2i3s4h5a@tcp(localhost:3306)/riley" up
+	migrate -path migrations -database "mysql://$(DB_USERNAME):$(DB_PASSWORD)@tcp($(DB_HOST):$(DB_PORT))/$(DB_DATABASE)" up
 rollback:
-	migrate -path migrations -database "mysql://misha:1m2i3s4h5a@tcp(localhost:3306)/riley" down
+	migrate -path migrations -database "mysql://$(DB_USERNAME):$(DB_PASSWORD)@tcp($(DB_HOST):$(DB_PORT))/$(DB_DATABASE)" down
